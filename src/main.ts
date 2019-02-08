@@ -1,4 +1,4 @@
-import {vec2, vec3} from 'gl-matrix';
+import {vec2, vec3, vec4} from 'gl-matrix';
 import * as Stats from 'stats-js';
 import * as DAT from 'dat-gui';
 import Square from './geometry/Square';
@@ -10,17 +10,28 @@ import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
-  tesselations: 5,
+  'Speed': 1.0,
+  color: "#000000",
   'Load Scene': loadScene, // A function pointer, essentially
 };
 
 let square: Square;
 let time: number = 0;
+let prevColor: string;
 
 function loadScene() {
   square = new Square(vec3.fromValues(0, 0, 0));
   square.create();
   // time = 0;
+}
+
+function hexToRgb(hex: string) {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+  } : null;
 }
 
 function main() {
@@ -47,6 +58,8 @@ function main() {
 
   // Add controls to the gui
   const gui = new DAT.GUI();
+  gui.add(controls, 'Speed', 0, 5);
+  gui.addColor(controls, 'color');
 
   // get canvas and webgl context
   const canvas = <HTMLCanvasElement> document.getElementById('canvas');
@@ -60,6 +73,8 @@ function main() {
 
   // Initial call to load scene
   loadScene();
+  prevColor = "#ff0000";
+  var rgbColor = hexToRgb(prevColor);
 
   const camera = new Camera(vec3.fromValues(0, 0, -10), vec3.fromValues(0, 0, 0));
 
@@ -71,6 +86,7 @@ function main() {
     new Shader(gl.VERTEX_SHADER, require('./shaders/flat-vert.glsl')),
     new Shader(gl.FRAGMENT_SHADER, require('./shaders/flat-frag.glsl')),
   ]);
+  flat.setGeometryColor(vec4.fromValues(rgbColor.r / 255, rgbColor.g / 255, rgbColor.b / 255, 1));
 
   function processKeyPresses() {
     // Use this if you wish
@@ -86,7 +102,12 @@ function main() {
     renderer.render(camera, flat, [
       square,
     ], time);
-    time++;
+    time += controls.Speed;
+    if(controls.color !== prevColor) {
+      prevColor = controls.color;
+      rgbColor = hexToRgb(prevColor);
+      flat.setGeometryColor(vec4.fromValues(rgbColor.r / 255, rgbColor.g / 255, rgbColor.b / 255, 1));
+    }
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
