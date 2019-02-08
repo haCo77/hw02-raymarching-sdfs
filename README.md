@@ -19,7 +19,8 @@ I check the sdf values of the most near boxes. If they are close to each other, 
 
 - I mod the coordinate of the ray to create copies of balloons form one. I change the positions of balloons using the transform function I wrote. I increase the y coordinates along the pass of time so balloons are flying. I also calculate a cell coordinates(for each balloon copy) and put it into some noise funcition and then translate the balloon copy based on this value. So now balllons seems to be irregularly positioned. 
 
-- I made a moon by using subtraction between a large sphere and lots of other sphere. I assign the colors of the moon and ballons according to there normals. I animate the color of the moon by time t which is smoothstep-ed. I add gui to control the speed of balloon flying and the color of the moon. 
+- I made a moon by using subtraction between a large sphere and lots of other sphere. I assign the colors of the moon and ballons according to there normals. I animate the color of the moon by time t which is smoothstep-ed. I add gui to control the speed of balloon flying and the color of the moon.
+- I add tree of bounding boxes to cull out most of the ray marching. 
 
 Scene Shot
 ---------
