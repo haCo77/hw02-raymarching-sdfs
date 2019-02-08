@@ -1,89 +1,30 @@
 # CIS 566 Homework 2: Implicit Surfaces
 
-## Objective
-- Gain experience with signed distance functions
-- Experiment with animation curves
+## ID
+ - __Name:__ Jiangping Xu
+ - __PennKey:__ xjp
 
-## Base Code
-The code we have provided for this assignment features the following:
-- A square that spans the range [-1, 1] in X and Y that is rendered with a
-shader that does not apply a projection matrix to it, thus rendering it as the
-entirety of your screen
-- TypeScript code just like the code in homework 1 to set up a WebGL framework
-- Code that passes certain camera attributes (listed in the next section),
-the screen dimensions, and a time counter to the shader program.
+Citation
+----------
+[IQ's Article on SDFs](http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm)
 
-## Assignment Requirements
-- __(10 points)__ Modify the provided `flat-frag.glsl` to cast rays from a
-virtual camera. We have set up uniform variables in your shader that take in
-the eye position, reference point position, and up vector of the `Camera` in
-the provided TypeScript code, along with a uniform that stores the screen width
-and height. Using these uniform variables, and only these uniform variables,
-you must write a function that uses the NDC coordinates of the current fragment
-(i.e. its fs_Pos value) and projects a ray from that pixel. Refer to the [slides
-on ray casting](https://docs.google.com/presentation/d/e/2PACX-1vSN5ntJISgdOXOSNyoHimSVKblnPnL-Nywd6aRPI-XPucX9CeqzIEGTjFTwvmjYUgCglTqgvyP1CpxZ/pub?start=false&loop=false&delayms=60000&slide=id.g27215b64c6_0_107)
-from CIS 560 for reference on how to cast a ray without an explicit
-view-projection matrix. You'll have to compute your camera's Right vector based
-on the provided Up vector, Eye point, and Ref point. You can test your ray
-casting function by converting your ray directions to colors using the formula
-`color = 0.5 * (dir + vec3(1.0, 1.0, 1.0))`. If your screen looks like the
-following image, your rays are being cast correctly:
-![](rayDir.png)
-- __(70 points)__ Create and animate a scene using signed distance functions.
-The subject of your scene can be anything you like, provided your scene includes
-the following elements:
-  - The SDF combination operations Intersection, Subtraction, and Smooth Blend
-  - Raymarch optimization by way of bounding volumes around SDFs, arranged in
-  a Bounding Volume Hierarchy
-  - Animation of at least two scene attributes such as color, position, scale,
-  twist, rotation, texture, or anything else you can think of
-  - At least two functions mentioned in the Toolbox Functions slides used for
-  animation
-  - Procedural texturing using toolbox functions and/or noise functions
-  - Shading that involves surface normal computation
+Demo
+---------
+https://haco77.github.io/hw02-raymarching-sdfs/
 
-- __(10 points)__ Add GUI elements via dat.GUI that allow the user to modify at
-least two different attributes of your scene.
+Implementation Details
+----------
+- I use the box's sdf function to create lots of boxs. I write a transform function to transform the objects by transform the casting ray. The object being transform will change in an opposite way(as use the inverse of the transformation matrix). I use that function to put boxs together, and modofy the shape to make them a balloon.
+I check the sdf values of the most near boxes. If they are close to each other, I will interpolate the sdf value of the balloon between these two boxes' sdf values. Otherwise I will only use the smallest sdf value of boxes as the final sdf value of balloon. So the boxes are smoothly combined. I add a rope at the bottom and rotate it by its y coordinate and time. So there is animation of rope waving.    
 
-- __(10 points)__ Following the specifications listed
-[here](https://github.com/pjcozzi/Articles/blob/master/CIS565/GitHubRepo/README.md),
-create your own README.md, renaming this file to INSTRUCTIONS.md. Don't worry
-about discussing runtime optimization for this project. Make sure your
-README contains the following information:
-  - Your name and PennKey
-  - Citation of any external resources you found helpful when implementing this
-  assignment.
-  - A link to your live github.io demo (refer to the pinned Piazza post on
-    how to make a live demo through github.io)
-  - An explanation of the techniques you used to generate your planet features.
-  Please be as detailed as you can; not only will this help you explain your work
-  to recruiters, but it helps us understand your project when we grade it!
+- I mod the coordinate of the ray to create copies of balloons form one. I change the positions of balloons using the transform function I wrote. I increase the y coordinates along the pass of time so balloons are flying. I also calculate a cell coordinates(for each balloon copy) and put it into some noise funcition and then translate the balloon copy based on this value. So now balllons seems to be irregularly positioned. 
 
-## Useful Links
-- [IQ's Article on SDFs](http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm)
-- [IQ's Article on Smooth Blending](http://www.iquilezles.org/www/articles/smin/smin.htm)
-- [IQ's Article on Useful Functions](http://www.iquilezles.org/www/articles/functions/functions.htm)
-- [Breakdown of Rendering an SDF Scene](http://www.iquilezles.org/www/material/nvscene2008/rwwtt.pdf)
+- I made a moon by using subtraction between a large sphere and lots of other sphere. I assign the colors of the moon and ballons according to there normals. I animate the color of the moon by time t which is smoothstep-ed. I add gui to control the speed of balloon flying and the color of the moon. 
 
+Scene Shot
+---------
+![](img/shot1.png)
 
-## Submission
-Commit and push to Github, then submit a link to your commit on Canvas. Remember
-to make your own README!
+![](img/shot2.png)
 
-## Inspiration
-- [Alien Corridor](https://www.shadertoy.com/view/4slyRs)
-- [The Evolution of Motion](https://www.shadertoy.com/view/XlfGzH)
-- [Fractal Land](https://www.shadertoy.com/view/XsBXWt)
-- [Voxel Edges](https://www.shadertoy.com/view/4dfGzs)
-- [Snail](https://www.shadertoy.com/view/ld3Gz2)
-- [Cubescape](https://www.shadertoy.com/view/Msl3Rr)
-- [Journey Tribute](https://www.shadertoy.com/view/ldlcRf)
-- [Stormy Landscape](https://www.shadertoy.com/view/4ts3z2)
-- [Generators](https://www.shadertoy.com/view/Xtf3Rn)
-
-## Extra Credit (20 points maximum)
-- __(5 - 20 pts)__ Do some research into more advanced shading techniques such
-as ambient occlusion, soft shadows, GGX materials, depth of field, volumetrics,
-etc. and implement one of them. The more complex your feature, the more points
-you'll earn.
-- __(? pts)__ Propose an extra feature of your own!
+Change the color of moon using gui
